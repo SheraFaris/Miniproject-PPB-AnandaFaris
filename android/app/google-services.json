@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1097707747641",
+    "project_id": "steam-login-d0e95",
+    "storage_bucket": "steam-login-d0e95.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1097707747641:android:3e2c81dd17145cf0abd0e8",
+        "android_client_info": {
+          "package_name": "com.example.trial1"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAZ-aJPjIhA0kP50R0a8SlSIhibOuiGh3E"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
