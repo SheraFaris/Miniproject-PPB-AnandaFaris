@@ -1,0 +1,93 @@
+/*
+================================================================================
+                           MAIN.DART - KODE LAMA (SEBELUM ISAR)
+================================================================================
+
+import 'package:flutter/material.dart';
+import 'package:trial1/pages/auth_page.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
+
+void main() async{
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform
+  );
+  runApp(const MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const MaterialApp(
+      debugShowCheckedModeBanner: false,
+      home: AuthPage(),
+    );
+  }
+}
+
+CATATAN:
+--------
+✅ Hanya initialize Firebase saja
+❌ Belum ada database lokal (Isar) untuk menyimpan notes
+
+================================================================================
+                       MAIN.DART - VERSI 1.1 (DENGAN ISAR)
+================================================================================
+
+import 'package:flutter/material.dart';
+import 'package:trial1/pages/auth_page.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:provider/provider.dart';
+import 'package:trial1/models/note_database.dart';
+import 'firebase_options.dart';
+
+void main() async{
+  WidgetsFlutterBinding.ensureInitialized();
+  
+  // Firebase initialization
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform
+  );
+  
+  // Isar database initialization
+  await NoteDatabase.initialize();
+  
+  runApp(
+    ChangeNotifierProvider(
+      create: (context) => NoteDatabase(),
+      child: const MyApp(),
+    ),
+  );
+}
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const MaterialApp(
+      debugShowCheckedModeBanner: false,
+      home: AuthPage(),
+    );
+  }
+}
+
+PERUBAHAN:
+---------
+✅ Tambahkan Provider initialization untuk NoteDatabase
+✅ Initialize Isar database pada startup
+✅ Wrap MyApp dengan ChangeNotifierProvider untuk state management
+
+DEPENDENCIES YANG DITAMBAHKAN:
+-----------------------------
+✅ provider: ^6.0.0
+✅ isar: ^4.0.0
+✅ isar_flutter_libs: ^4.0.0
+✅ path_provider: ^2.1.0
+✅ build_runner (dev)
+✅ isar_generator (dev)
+
+*/

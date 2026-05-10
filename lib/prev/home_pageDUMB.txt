@@ -1,0 +1,110 @@
+/*
+================================================================================
+                           HOME_PAGE.DART - VERSI 1
+================================================================================
+
+KODE LAMA:
+----------
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
+
+class HomePage extends StatelessWidget{
+  HomePage({super.key});
+
+  final user = FirebaseAuth.instance.currentUser!;
+  void signUserOut(){
+    FirebaseAuth.instance.signOut();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        actions: [
+          IconButton(
+            onPressed: signUserOut, 
+            icon: Icon(Icons.logout),
+          )
+        ],
+      ), 
+      body: Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              "LOGGED IN AS: "+ user.email!,
+              style: TextStyle(fontSize: 20),
+              textAlign: TextAlign.center,
+            ),
+            SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: () async {
+                final uri = Uri.parse('https://steamdb.info/stats/gameratings/');
+                if (await canLaunchUrl(uri)) {
+                  await launchUrl(uri, mode: LaunchMode.externalApplication);
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Could not open the URL')),
+                  );
+                }
+              },
+              child: Text('Open SteamDB gameratings'),
+            )
+          ],
+        )
+      )
+    );
+  }
+}
+
+CATATAN:
+--------
+✅ Versi lama hanya membuka link SteamDB di browser eksternal.
+❌ Belum ada pengambilan data game dan belum ada tampilan teks daftar game di halaman utama.
+
+
+================================================================================
+                           HOME_PAGE.DART - VERSI 1.1
+================================================================================
+
+KODE UPDATE (PERCOBAAN STEAMDB FETCH):
+--------------------------------------
+// Menambahkan import:
+import 'package:html/parser.dart' as html_parser;
+import 'package:http/http.dart' as http;
+
+// Mengubah dari StatelessWidget menjadi StatefulWidget
+// Menambahkan logic untuk fetch data dari SteamDB
+// Menambahkan UI untuk menampilkan list game sebagai Text
+
+// Juga menambahkan dependency di pubspec.yaml:
+  http: ^1.4.0
+  html: ^0.15.5
+
+PERCOBAAN DILAKUKAN:
+-------------------
+✅ Membuat StatefulWidget untuk fetch data async
+✅ Menambahkan HTML parser untuk scraping game list
+✅ Menambahkan UI dengan ListView untuk tampilan game
+✅ Menambahkan error handling untuk Cloudflare 403
+
+MASALAH YANG DITEMUKAN:
+----------------------
+❌ SteamDB memblokir request otomatis dengan Cloudflare challenge
+❌ Meskipun User-Agent ditambahkan, masih mendapat HTTP 403
+❌ Percobaan dari terminal menunjukkan Cloudflare protection aktif
+
+KEPUTUSAN:
+---------
+❌ UNDO - Kembali ke VERSI 1 (kode asli) karena SteamDB tidak accessible via automated request
+✅ Akan cari solusi alternatif di masa depan (Steam API, backend proxy, atau data hardcoded)
+
+HASIL UNDO:
+-----------
+✅ home_page.dart dikembalikan ke StatelessWidget original
+✅ Dependencies http dan html dihapus dari pubspec.yaml
+✅ pub get berhasil dijalankan
+✅ Tidak ada error pada kode
+
+*/

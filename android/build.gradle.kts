@@ -14,6 +14,13 @@ rootProject.layout.buildDirectory.value(newBuildDir)
 subprojects {
     val newSubprojectBuildDir: Directory = newBuildDir.dir(project.name)
     project.layout.buildDirectory.value(newSubprojectBuildDir)
+    
+    // Set namespace for library projects
+    plugins.withId("com.android.library") {
+        configure<com.android.build.gradle.LibraryExtension> {
+            namespace = "com.example.trial1.${project.name}"
+        }
+    }
 }
 subprojects {
     project.evaluationDependsOn(":app")

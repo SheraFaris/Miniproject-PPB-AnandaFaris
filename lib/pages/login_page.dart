@@ -19,6 +19,12 @@ class _LoginPageState extends State<LoginPage> {
 
   //Sign in
   void signUserIn() async { 
+    // Validasi input kosong
+    if (emailController.text.isEmpty || passwordController.text.isEmpty) {
+      showErrorMessage("Please fill in all fields");
+      return;
+    }
+    
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -34,12 +40,24 @@ class _LoginPageState extends State<LoginPage> {
         email: emailController.text, 
         password: passwordController.text,
       );
-      Navigator.pop(context);      
+      
+      // Close dialog only if widget is still mounted
+      if (mounted) {
+        Navigator.pop(context);
+      }      
     } on FirebaseAuthException catch (e){
-      Navigator.pop(context);
-
-      //show errot message
-      showErrorMessage(e.code);
+      // Close dialog only if widget is still mounted
+      if (mounted) {
+        Navigator.pop(context);
+        //show error message
+        showErrorMessage(e.code);
+      }
+    } catch (e) {
+      // Catch any other unexpected errors
+      if (mounted) {
+        Navigator.pop(context);
+        showErrorMessage("An unexpected error occurred: ${e.toString()}");
+      }
     }
   }
   

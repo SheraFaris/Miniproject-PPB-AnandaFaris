@@ -1,0 +1,154 @@
+/*
+================================================================================
+                          LOGIN_PAGE.DART - VERSI 1
+================================================================================
+
+KODE LAMA:
+----------
+void signUserIn() async { 
+  showDialog(
+    context: context,
+    barrierDismissible: false,
+    builder: (context){
+      return const Center(
+        child: CircularProgressIndicator(),
+      );
+    },
+  );
+
+  try{
+    await FirebaseAuth.instance.signInWithEmailAndPassword(
+      email: emailController.text, 
+      password: passwordController.text,
+    );
+    Navigator.pop(context);      
+  } on FirebaseAuthException catch (e){
+    Navigator.pop(context);
+    showErrorMessage(e.code);
+  }
+}
+
+WHY WRONG / MASALAH:
+--------------------
+❌ Navigator.pop(context) dipanggil tanpa pengecekan apakah widget masih mounted
+❌ Jika dialog ditutup sebelum login selesai, bisa terjadi error "Looking up a deactivated widget's ancestor"
+❌ Tidak ada penanganan error yang tidak terduga (unexpected errors)
+
+PERUBAHAN (Solusi):
+-------------------
+✅ Tambahkan pengecekan "if (mounted)" sebelum Navigator.pop()
+✅ Tambahkan blok catch untuk error yang tidak terduga
+✅ Pastikan dialog selalu ditutup dengan benar di semua path
+
+
+================================================================================
+                          LOGIN_PAGE.DART - VERSI 1.1
+================================================================================
+
+KODE UPDATE:
+------------
+void signUserIn() async { 
+  showDialog(
+    context: context,
+    barrierDismissible: false,
+    builder: (context){
+      return const Center(
+        child: CircularProgressIndicator(),
+      );
+    },
+  );
+
+  try{
+    await FirebaseAuth.instance.signInWithEmailAndPassword(
+      email: emailController.text, 
+      password: passwordController.text,
+    );
+    
+    if (mounted) {
+      Navigator.pop(context);
+    }      
+  } on FirebaseAuthException catch (e){
+    if (mounted) {
+      Navigator.pop(context);
+      showErrorMessage(e.code);
+    }
+  } catch (e) {
+    if (mounted) {
+      Navigator.pop(context);
+      showErrorMessage("An unexpected error occurred");
+    }
+  }
+}
+
+WHY WRONG / MASALAH YANG TETAP ADA:
+-----------------------------------
+❌ Dialog loading ditampilkan meski input kosong
+❌ Firebase akan timeout menunggu email/password kosong
+❌ User menunggu lama tanpa feedback yang jelas
+
+PERUBAHAN DARI VERSI 1:
+-----------------------
+✅ Tambahkan pengecekan "if (mounted)" sebelum Navigator.pop()
+✅ Tambahkan blok catch (e) untuk error tidak terduga
+✅ Error handling lebih lengkap
+
+
+================================================================================
+                          LOGIN_PAGE.DART - VERSI 1.2
+================================================================================
+
+KODE UPDATE:
+------------
+void signUserIn() async { 
+  // Validasi input kosong
+  if (emailController.text.isEmpty || passwordController.text.isEmpty) {
+    showErrorMessage("Please fill in all fields");
+    return;
+  }
+  
+  showDialog(
+    context: context,
+    barrierDismissible: false,
+    builder: (context){
+      return const Center(
+        child: CircularProgressIndicator(),
+      );
+    },
+  );
+
+  try{
+    await FirebaseAuth.instance.signInWithEmailAndPassword(
+      email: emailController.text, 
+      password: passwordController.text,
+    );
+    
+    if (mounted) {
+      Navigator.pop(context);
+    }      
+  } on FirebaseAuthException catch (e){
+    if (mounted) {
+      Navigator.pop(context);
+      showErrorMessage(e.code);
+    }
+  } catch (e) {
+    if (mounted) {
+      Navigator.pop(context);
+      showErrorMessage("An unexpected error occurred: ${e.toString()}");
+    }
+  }
+}
+
+MASALAH YANG SUDAH DIPERBAIKI:
+------------------------------
+✅ Dialog loading sekarang hanya muncul jika input valid
+✅ Prevent Firebase timeout call
+✅ User tahu error lebih cepat tanpa menunggu loading
+
+PERUBAHAN DARI VERSI 1.1:
+-------------------------
+✅ Tambahkan validasi input kosong sebelum loading dialog
+✅ Early return jika input tidak valid
+✅ Tambahkan detail error message: e.toString()
+✅ Kurangi race condition dengan early validation
+
+*/

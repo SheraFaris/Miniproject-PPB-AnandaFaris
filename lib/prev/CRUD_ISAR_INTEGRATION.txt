@@ -1,0 +1,200 @@
+/*
+================================================================================
+                     INTEGRASI CRUD LOCAL DATABASE DENGAN ISAR
+                        Berdasarkan Materi 06 GitHub ITS
+================================================================================
+
+STRUKTUR FILE YANG DITAMBAHKAN:
+==============================
+
+1. lib/models/note.dart
+   - Model Note dengan Isar Collection
+   - Fieldnya: id (auto-increment) dan text
+
+2. lib/models/note_database.dart
+   - NoteDatabase class dengan ChangeNotifier
+   - Fungsi CRUD: addNote, fetchNotes, updateNote, deleteNote
+   - Initialize database dengan path Android/iOS yang sesuai
+
+3. lib/pages/notes_page.dart
+   - StatefulWidget untuk tampilan CRUD notes
+   - TextEditingController untuk input user
+   - Dialog untuk create dan update note
+   - ListView untuk menampilkan daftar notes
+
+4. Update lib/main.dart
+   - Initialize NoteDatabase pada startup
+   - Wrap app dengan ChangeNotifierProvider
+
+5. Update pubspec.yaml
+   - Tambah dependencies: provider, isar, isar_flutter_libs, path_provider
+   - Tambah dev_dependencies: build_runner, isar_generator
+
+================================================================================
+                        FLOW PELAKSANAAN CRUD
+================================================================================
+
+CREATE NOTE:
+-----------
+1. User tekan FAB (Floating Action Button) +
+2. Dialog muncul dengan TextField untuk input
+3. User ketik teks catatan
+4. User tekan "Create"
+5. NoteDatabase.addNote(text) dipanggil
+6. Buat object Note baru dengan text dari user
+7. Simpan ke Isar database dengan isar.writeTxn()
+8. Panggil fetchNotes() untuk reload data
+9. ListView refresh dengan data terbaru
+
+READ NOTE:
+----------
+1. Widget build() memanggil context.watch<NoteDatabase>()
+2. Ambil currentNotes dari NoteDatabase
+3. ListView.builder menampilkan setiap note di daftar
+4. Setiap note ditampilkan sebagai Card dengan ListTile
+5. Menampilkan id dan text dari note
+
+UPDATE NOTE:
+-----------
+1. User tekan icon edit di samping note
+2. Dialog muncul dengan text note yang ada
+3. User edit text di TextField
+4. User tekan "Update"
+5. NoteDatabase.updateNote(id, newText) dipanggil
+6. Cari note dengan id tersebut
+7. Update text property
+8. Simpan ke database dengan isar.writeTxn()
+9. Panggil fetchNotes() untuk reload data
+10. ListView refresh dengan data terbaru
+
+DELETE NOTE:
+-----------
+1. User tekan icon delete di samping note
+2. NoteDatabase.deleteNote(id) dipanggil langsung
+3. Hapus note dari database dengan isar.notes.delete(id)
+4. Panggil fetchNotes() untuk reload data
+5. ListView refresh dengan data terbaru
+
+================================================================================
+                        DEPENDENCIES YANG DITAMBAHKAN
+================================================================================
+
+provider: ^6.0.0
+  - State management untuk share NoteDatabase ke seluruh app
+  - Gunakan context.read() untuk akses tanpa listen
+  - Gunakan context.watch() untuk akses dan listen perubahan
+
+isar: ^3.1.0+1
+  - Local database solution yang cepat dan efficient
+  - Column-oriented storage format
+  - Support untuk Dart objects dengan annotation @Collection()
+
+isar_flutter_libs: ^3.1.0+1
+  - Native library Isar untuk Flutter
+  - Perlu untuk mengcompile native code
+
+path_provider: ^2.1.0
+  - Mendapatkan path directory yang sesuai untuk setiap platform
+  - Android: getApplicationDocumentsDirectory()
+  - iOS: getTemporaryDirectory()
+
+build_runner: ^2.4.0 (dev)
+  - Tool untuk generate code dart
+  - Jalankan: dart run build_runner build
+
+isar_generator: ^3.1.0+1 (dev)
+  - Generator untuk Isar collection
+  - Menggenerate note.g.dart dari note.dart
+
+================================================================================
+                        CARA MENJALANKAN
+================================================================================
+
+1. Jalankan pub get:
+   flutter pub get
+
+2. Generate Isar code:
+   dart run build_runner build
+   
+   (Atau jika ada error, coba):
+   flutter pub run build_runner build
+
+   Ini akan menggenerate file 'note.g.dart' di lib/models/
+
+3. Jalankan app:
+   flutter run
+
+4. Test CRUD:
+   - Tekan + untuk membuat note baru
+   - Masukkan teks catatan
+   - Tekan Create
+   - Lihat catatan di list
+   - Tekan edit untuk mengubah
+   - Tekan delete untuk menghapus
+
+================================================================================
+                        FITUR YANG TERSEDIA
+================================================================================
+
+✅ Create: Tambah catatan baru
+✅ Read: Tampilkan semua catatan yang sudah dibuat
+✅ Update: Edit catatan yang sudah ada
+✅ Delete: Hapus catatan dari database
+✅ Provider: State management untuk real-time UI update
+✅ Dialog UI: Form untuk create dan update note
+✅ Card UI: Tampilan catatan dengan edit/delete buttons
+✅ Empty State: Pesan jika belum ada catatan
+
+================================================================================
+                        REFERENSI
+================================================================================
+
+GitHub Materi: https://github.com/Algoritma-dan-Pemrograman-ITS/mobile-programming/tree/main/06.%20CRUD%20Local%20Database
+
+Database lain yang bisa digunakan:
+- Hive: Lebih simple dan mudah
+- ObjectBox: Mirip Isar, built-in relations
+- SQFlite: SQL-based, lebih tradisional
+
+================================================================================
+                        TROUBLESHOOTING
+================================================================================
+
+MASALAH: Error "Looking up a deactivated widget's ancestor"
+SOLUSI: Pastikan menggunakan if (mounted) sebelum setState atau Navigator
+
+MASALAH: note.g.dart tidak digenerate
+SOLUSI: Jalankan: dart run build_runner build --delete-conflicting-outputs
+
+MASALAH: Database error pada platform iOS/macOS
+SOLUSI: Cek platform check di NoteDatabase.initialize()
+
+================================================================================
+ROLLBACK KE VERSI 1.2
+================================================================================
+
+STATUS TERAKHIR:
+--------------
+✅ CRUD local database sempat diintegrasikan
+✅ build_runner berhasil generate file
+❌ Build aplikasi terhenti oleh symlink support di Windows
+
+ALASAN ROLLBACK:
+--------------
+- Kode dikembalikan ke versi 1.2 yang stabil
+- Fokus kembali ke flow auth awal tanpa database lokal
+- File CRUD Isar dianggap tidak dipakai lagi di build utama
+
+PERUBAHAN YANG DIBATALKAN:
+------------------------
+- Import dan inisialisasi `NoteDatabase` di `main.dart`
+- Dependensi `provider`, `isar_community`, `isar_community_flutter_libs`, `path_provider`
+- Dependensi dev `build_runner` dan `isar_community_generator`
+- File `note.dart`, `note_database.dart`, `notes_page.dart`, dan `note.g.dart`
+
+VERSI AKTIF SAAT INI:
+-------------------
+1.2
+
+================================================================================
+*/

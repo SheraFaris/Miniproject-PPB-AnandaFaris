@@ -20,6 +20,20 @@ class _RegisterPageState extends State<RegisterPage> {
 
   //Sign up
   void signUserUp() async { 
+    // Validasi input kosong
+    if (emailController.text.isEmpty || 
+        passwordController.text.isEmpty || 
+        confirmPasswordController.text.isEmpty) {
+      showErrorMessage("Please fill in all fields");
+      return;
+    }
+    
+    // Validasi password match sebelum menampilkan loading
+    if(passwordController.text != confirmPasswordController.text){
+      showErrorMessage("Passwords do not match");
+      return;
+    }
+    
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -31,20 +45,28 @@ class _RegisterPageState extends State<RegisterPage> {
     );
 
     try{
-      if(passwordController == confirmPasswordController.text){
-        await FirebaseAuth.instance.createUserWithEmailAndPassword(
-          email: emailController.text, 
-          password: passwordController.text,
-        );
-      } else {
-        showErrorMessage("Password incorrect");
+      await FirebaseAuth.instance.createUserWithEmailAndPassword(
+        email: emailController.text, 
+        password: passwordController.text,
+      );
+      
+      // Close dialog only if widget is still mounted
+      if (mounted) {
+        Navigator.pop(context);
       }
-      Navigator.pop(context);      
     } on FirebaseAuthException catch (e){
-      Navigator.pop(context);
-
-      //show errot message
-      showErrorMessage(e.code);
+      // Close dialog only if widget is still mounted
+      if (mounted) {
+        Navigator.pop(context);
+        //show error message
+        showErrorMessage(e.code);
+      }
+    } catch (e) {
+      // Catch any other unexpected errors
+      if (mounted) {
+        Navigator.pop(context);
+        showErrorMessage("An unexpected error occurred: ${e.toString()}");
+      }
     }
   }
   
